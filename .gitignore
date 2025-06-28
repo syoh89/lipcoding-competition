@@ -108,5 +108,8 @@ temp/
 # Database files (keep for demo)
 # backend/database.sqlite
 
-# Uploads (keep for demo)
+# Uploads (keep for demo)  
 # backend/uploads/
+
+# Capture images (include for demo)
+!capture-images/
