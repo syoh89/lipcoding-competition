@@ -23,10 +23,14 @@ app.use(helmet({
 }));
 app.use(compression());
 
-// Rate limiting
+// Rate limiting - relaxed for development
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 1000, // increased limit for development
+  skip: (req) => {
+    // Skip rate limiting for development environment
+    return process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+  }
 });
 app.use(limiter);
 
@@ -101,23 +105,60 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
+// Global error handlers for uncaught exceptions and unhandled rejections
+process.on('uncaughtException', (error: Error) => {
+  console.error('Uncaught Exception:', error);
+  console.error('Stack:', error.stack);
+  // Allow a graceful shutdown in production
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+});
+
+process.on('unhandledRejection', (reason: unknown, promise: Promise<unknown>) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  // Allow a graceful shutdown in production
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
+});
+
 async function startServer() {
   try {
     // Initialize database
     await initializeDatabase();
     console.log('Database initialized successfully');
     
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
       console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
       console.log(`📋 OpenAPI Spec: http://localhost:${PORT}/openapi.json`);
     });
+
+    // Graceful shutdown handling
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM received, shutting down gracefully');
+      server.close(() => {
+        console.log('Process terminated');
+      });
+    });
+
+    process.on('SIGINT', () => {
+      console.log('SIGINT received, shutting down gracefully');
+      server.close(() => {
+        console.log('Process terminated');
+      });
+    });
+
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);
   }
 }
 
-startServer();
+startServer().catch((error) => {
+  console.error('Startup error:', error);
+  process.exit(1);
+});
 
 export default app;
