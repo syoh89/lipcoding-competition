@@ -9,8 +9,6 @@ const SignupPage: React.FC = () => {
     password: '',
     name: '',
     role: 'mentee',
-    bio: '',
-    skills: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,7 +30,15 @@ const SignupPage: React.FC = () => {
     setError('');
 
     try {
-      await signup(formData);
+      // API에 맞는 형식으로 데이터 준비
+      const signupData = {
+        email: formData.email,
+        password: formData.password,
+        name: formData.name,
+        role: formData.role,
+      };
+      
+      await signup(signupData);
       navigate('/login', { 
         state: { message: '회원가입이 완료되었습니다. 로그인해주세요.' }
       });
@@ -112,29 +118,6 @@ const SignupPage: React.FC = () => {
                 <option value="mentee">멘티</option>
                 <option value="mentor">멘토</option>
               </select>
-            </div>
-            <div>
-              <label htmlFor="bio" className="form-label">소개</label>
-              <textarea
-                id="bio"
-                name="bio"
-                className="form-input"
-                placeholder="자기소개를 입력하세요"
-                value={formData.bio}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <label htmlFor="skills" className="form-label">기술(쉼표로 구분)</label>
-              <input
-                id="skills"
-                name="skills"
-                type="text"
-                className="form-input"
-                placeholder="예: JavaScript,React,Node.js"
-                value={formData.skills}
-                onChange={handleChange}
-              />
             </div>
           </div>
           <div>

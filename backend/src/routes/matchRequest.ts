@@ -291,23 +291,6 @@ router.put('/match-requests/:id/accept',
         return res.status(400).json({ error: 'Request is not in pending status' });
       }
 
-      // Check if mentor already has an accepted request
-      const existingAccepted = await new Promise<MatchRequestRow | undefined>((resolve, reject) => {
-        db.get('SELECT * FROM match_requests WHERE mentor_id = ? AND status = ?',
-          [req.user!.userId, 'accepted'],
-          (err: SQLiteError | null, row: MatchRequestRow | undefined) => {
-            if (err) reject(err);
-            else resolve(row);
-          }
-        );
-      });
-
-      if (existingAccepted) {
-        return res.status(400).json({ 
-          error: 'You already have an accepted mentee. Please reject other requests first.' 
-        });
-      }
-
       // Accept the request
       await new Promise<void>((resolve, reject) => {
         db.run('UPDATE match_requests SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',

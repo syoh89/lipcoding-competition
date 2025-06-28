@@ -20,8 +20,6 @@ export interface SignupRequest {
   password: string;
   name: string;
   role: 'mentor' | 'mentee';
-  bio?: string;
-  skills?: string;
 }
 
 export interface LoginResponse {
