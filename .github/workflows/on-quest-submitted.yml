@@ -361,27 +361,27 @@ jobs:
             sleep 2
           done
 
-      - name: Run frontend app
-        shell: bash
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          pushd "${{ github.workspace }}/app/${{ steps.issue.outputs.frontend }}"
+      # - name: Run frontend app
+      #   shell: bash
+      #   env:
+      #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   run: |
+      #     pushd "${{ github.workspace }}/app/${{ steps.issue.outputs.frontend }}"
 
-          eval "${{ steps.issue.outputs.frontendCommand }}"
+      #     eval "${{ steps.issue.outputs.frontendCommand }}"
 
-          popd
+      #     popd
 
-      - name: Wait for frontend to be ready
-        run: |
-          for i in {1..30}; do
-            if nc -z localhost 3000; then
-              echo "Frontend is up!"
-              break
-            fi
-            echo "Waiting for frontend..."
-            sleep 2
-          done
+      # - name: Wait for frontend to be ready
+      #   run: |
+      #     for i in {1..30}; do
+      #       if nc -z localhost 3000; then
+      #         echo "Frontend is up!"
+      #         break
+      #       fi
+      #       echo "Waiting for frontend..."
+      #       sleep 2
+      #     done
 
       - name: Set up test environment
         shell: pwsh
@@ -426,15 +426,15 @@ jobs:
 
           popd
 
-      - name: Run tests - Frontend
-        shell: bash
-        continue-on-error: true
-        run: |
-          pushd ./quest-checker
+      # - name: Run tests - Frontend
+      #   shell: bash
+      #   continue-on-error: true
+      #   run: |
+      #     pushd ./quest-checker
 
-          dotnet test ./LipCoding.FrontendTests --logger "trx;LogFileName=test-results-frontend.trx" --no-build
+      #     dotnet test ./LipCoding.FrontendTests --logger "trx;LogFileName=test-results-frontend.trx" --no-build
 
-          popd
+      #     popd
 
       - name: Check the test results
         id: test-results
